@@ -1,0 +1,85 @@
+name: Build and Deploy Trust Protocol
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SOLANA_VERSION: stable
+  ANCHOR_VERSION: 0.30.1
+  RUST_TOOLCHAIN: stable
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/${{ env.SOLANA_VERSION }}/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Install Anchor CLI
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked
+          avm install ${{ env.ANCHOR_VERSION }}
+          avm use ${{ env.ANCHOR_VERSION }}
+          echo "$HOME/.avm/bin" >> $GITHUB_PATH
+
+      - name: Build program
+        run: anchor build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: trust-protocol-program
+          path: |
+            target/deploy/*.so
+            target/idl/*.json
+            target/types/*.ts
+
+  deploy-devnet:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: trust-protocol-program
+          path: target/
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/${{ env.SOLANA_VERSION }}/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Setup keypair
+        run: |
+          echo "${{ secrets.DEPLOYER_KEYPAIR }}" > deployer.json
+          solana config set --url devnet
+          solana config set --keypair deployer.json
+
+      - name: Deploy to devnet
+        run: |
+          solana program deploy target/deploy/trust_protocol.so --program-id target/deploy/trust_protocol-keypair.json
