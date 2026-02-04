@@ -1,5 +1,0 @@
-/home/georgiolaz/.openclaw/workspace/trust-protocol-solana/target/release/build/serde-d9df3ed67bffa98e/build_script_build-d9df3ed67bffa98e: /home/georgiolaz/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde-1.0.228/build.rs
-
-/home/georgiolaz/.openclaw/workspace/trust-protocol-solana/target/release/build/serde-d9df3ed67bffa98e/build_script_build-d9df3ed67bffa98e.d: /home/georgiolaz/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde-1.0.228/build.rs
-
-/home/georgiolaz/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde-1.0.228/build.rs:
