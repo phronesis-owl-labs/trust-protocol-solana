@@ -6,10 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-trust_protocol = "14Fb8S1RXN9D3Lsq5vLZyUzncYS799ys86xbq7k9tsp9"
+trust_protocol = "GbTC2a7rohHvGejH8dtvrgEV6usdqrk8eJs6Du97Pzh"
 
 [programs.devnet]
-trust_protocol = "14Fb8S1RXN9D3Lsq5vLZyUzncYS799ys86xbq7k9tsp9"
+trust_protocol = "GbTC2a7rohHvGejH8dtvrgEV6usdqrk8eJs6Du97Pzh"
 
 [registry]
 url = "https://api.apr.dev"
